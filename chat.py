@@ -30,7 +30,7 @@ def fetch_memories(vector, logs, count):
         return ordered
 
 
-def summarize_messages(messages: List[Message]) -> str:  # summarize a block of memories into one payload
+def summarize_messages(messages: List[Message], index: GPTTreeIndex) -> GPTTreeIndex:  # summarize a block of memories into one payload
     # memories = sorted(memories, key=lambda d: d['time'], reverse=False)  # sort them chronologically
     # block = ''
     # identifiers = list()
@@ -41,9 +41,10 @@ def summarize_messages(messages: List[Message]) -> str:  # summarize a block of 
     #     timestamps.append(mem['time'])
     # block = block.strip()
     message_string = '\n'.join([message.__str__() for message in messages])
-    prompt = open_file('prompts/prompt_notes.txt').replace('<<INPUT>>', message_string)
+    index.insert(Document(message_string))
+    return index
     # TODO - do this in the background over time to handle huge amounts of memories
-    notes = gpt3_completion(prompt)
+    # notes = gpt3_completion(prompt)
     return notes
     # notes.split('\n')
     # vector = gpt3_embedding(block)
@@ -116,30 +117,29 @@ def main():
     index = open_index_file()
     while True:
 
-        # Step 1: Get the current context window, ie last 12 messages.
+        # Step 1: Get the current context window, ie last 6 messages.
         # Step 2: Get the current message, search all indexed memories to retrieve facts that have been said
         # Step 3: Feed Current context window, and search results to a language model to predict next response
-        # Step 4: Add message to conversation. If conversation.message size is a multiple of 12, create a new document from the last 12 messages, and summarize it and index it
+        # Step 4: Add message to conversation. If conversation.message size is a multiple of 6, create a new document from the last 6 messages, and summarize it and index it
         # Step 5: Store this new memory by adding it to the index
 
         # step 1
         message = get_user_input()
-        context_window = conversation.get_last_messages_in_string(12)
+        context_window = conversation.get_last_messages_in_string(6)
 
         # step 2
         index_search_prompt = (
             open_file('prompts/prompt_index_search.txt')
             .replace('<<CURRENT QUERY>>', message.get_string())
         )
-        last_6_messages = conversation.get_last_messages_in_string(12)  # get last 6 messages as a string
-        if (conversation.get_messages().__len__() / 12 >= 1):
+        if (conversation.get_messages().__len__() / 6 >= 1):
             search_results = index.query(index_search_prompt)
         search_results = ""
 
         # step 3
         response_prompt = (
             open_file('prompts/prompt_response.txt')
-            .replace('<<CONVERSATION>>', last_6_messages)
+            .replace('<<CONVERSATION>>', context_window)
             .replace('<<MEMORIES>>', search_results)
             .replace('<<CHAT>>', message.get_string())
         )
@@ -147,12 +147,12 @@ def main():
         print("Liza: %s" % response)
 
         # step 4
-        
-        if len(conversation.get_messages()) % 12 == 0:
-            # create a new memory
-            new_memory = summarize_messages(conversation.get_last_messages_in_string(12))
-            index.insert(Document(new_memory))
         conversation.add_message(message)
+        if len(conversation.get_messages()) % 6 == 0:
+            # create a new memory
+            index = summarize_messages(conversation.get_last_messages_in_string(6), index)
+            index.save_to_disk('index.json')
+        print("Message count: %s" % len(conversation.get_messages()))
         # # step 3
         # search_queries = [i.strip() for i in gpt3_completion(gather_info_prompt).split('- ') if i.strip() != '']
         # # step 4
