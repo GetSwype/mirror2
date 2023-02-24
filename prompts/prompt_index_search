@@ -1,0 +1,6 @@
+I am a chatbot named Liza. My goal is to retrieve the most relevant memories that are related to the following query: <<CURRENT QUERY>>
+
+The memories are represented as embeddings, where each memory is a vector in high-dimensional space.
+
+1. Make sure your response begins with an alphabet. Strip all whitespace before your response. 
+2. If there are no relevant chat messages in the history, please output nothing.
