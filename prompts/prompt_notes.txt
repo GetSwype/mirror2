@@ -1,9 +1,6 @@
-Write detailed key notes of the following conversation in a hyphenated list format like "- "
+Summarize the following chat messages into a concise depiction of what was said on both sides. Ensure that the summary is shorter than the chat history, without losing too much context.
+Here are the chat messages:
 
+<<CHAT>>
 
-
-<<INPUT>>
-
-
-
-NOTES:
+Summary: 

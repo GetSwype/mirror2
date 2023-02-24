@@ -30,17 +30,18 @@ def fetch_memories(vector, logs, count):
         return ordered
 
 
-def summarize_memories(memories):  # summarize a block of memories into one payload
-    memories = sorted(memories, key=lambda d: d['time'], reverse=False)  # sort them chronologically
-    block = ''
-    identifiers = list()
-    timestamps = list()
-    for mem in memories:
-        block += mem['message'] + '\n\n'
-        identifiers.append(mem['uuid'])
-        timestamps.append(mem['time'])
-    block = block.strip()
-    prompt = open_file('prompt_notes.txt').replace('<<INPUT>>', block)
+def summarize_messages(messages: List[Message]) -> str:  # summarize a block of memories into one payload
+    # memories = sorted(memories, key=lambda d: d['time'], reverse=False)  # sort them chronologically
+    # block = ''
+    # identifiers = list()
+    # timestamps = list()
+    # for mem in memories:
+    #     block += mem['message'] + '\n\n'
+    #     identifiers.append(mem['uuid'])
+    #     timestamps.append(mem['time'])
+    # block = block.strip()
+    message_string = '\n'.join([message.__str__() for message in messages])
+    prompt = open_file('prompts/prompt_notes.txt').replace('<<INPUT>>', message_string)
     # TODO - do this in the background over time to handle huge amounts of memories
     notes = gpt3_completion(prompt)
     return notes
@@ -105,7 +106,7 @@ def open_index_file():
     except FileNotFoundError:
         # If the file does not exist, create it and write some default text
         with open(file_name, 'w') as file:
-            tree_index = GPTTreeIndex([])
+            tree_index = GPTTreeIndex([Document("")])
             tree_index.save_to_disk(file_name)
             print('No index file found. Created: ', file_name)
             return tree_index
@@ -131,7 +132,9 @@ def main():
             .replace('<<CURRENT QUERY>>', message.get_string())
         )
         last_6_messages = conversation.get_last_messages_in_string(12)  # get last 6 messages as a string
-        search_results = index.query(index_search_prompt)
+        if (conversation.get_messages().__len__() / 12 >= 1):
+            search_results = index.query(index_search_prompt)
+        search_results = ""
 
         # step 3
         response_prompt = (
@@ -147,7 +150,7 @@ def main():
         
         if len(conversation.get_messages()) % 12 == 0:
             # create a new memory
-            new_memory = summarize_memories(conversation.get_last_messages(12))
+            new_memory = summarize_messages(conversation.get_last_messages_in_string(12))
             index.insert(Document(new_memory))
         conversation.add_message(message)
         # # step 3
