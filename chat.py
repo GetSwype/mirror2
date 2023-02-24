@@ -106,6 +106,7 @@ def open_index_file():
         # If the file does not exist, create it and write some default text
         with open(file_name, 'w') as file:
             tree_index = GPTTreeIndex([])
+            tree_index.save_to_disk(file_name)
             print('No index file found. Created: ', file_name)
             return tree_index
 
