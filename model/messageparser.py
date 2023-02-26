@@ -1,5 +1,5 @@
 import datetime
-from core import Message
+from model.core import Message
 
 
 class MessageParser:

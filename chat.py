@@ -29,7 +29,9 @@ def main():
 
         message = get_user_input()
         response = conversation.complete(message)
-        print("Brion: ", response.text)
+        print("...................................")
+        print(response.text)
+        print("...................................")
         conversation.add_message(message)
         conversation.add_message(response)
         conversation.save()

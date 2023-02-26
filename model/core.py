@@ -44,7 +44,8 @@ class Storage(object):
     @classmethod
     def instance(cls):
         if cls._instance is None:
-            cls._instance = redis.Redis.from_url('redis://default:uOVMaPKnHAxnNbJcVRDr@containers-us-west-178.railway.app:6381')
+            cls._instance = redis.Redis.from_url(
+                'redis://default:uOVMaPKnHAxnNbJcVRDr@containers-us-west-178.railway.app:6381')
         return cls._instance
 
     @classmethod
@@ -60,9 +61,6 @@ class Conversation:
         self.context_window_size: int = 0
         self._load()
 
-    def __dict__(self):
-        return {'context_window': [msg.__dict__() for msg in self.context_window], 'context_window_size': self.context_window_size, "id": self.id, "idx": self.idx}
-
     def _load(self):
         value = Storage.instance().get(self.id)
         if value is None:
@@ -74,7 +72,7 @@ class Conversation:
             self.idx = GPTTreeIndex.load_from_string(value['index'])
             self.context_window_size = value['context_window_size']
             self.context_window = [
-                Message(m.get("author"), m.get("text"), m.get("timestamp")) for m in value['context_window']]
+                Message(m["author"], m["message"], m["timestamp"]) for m in value['context_window']]
 
     def _store(self):
         value = {
