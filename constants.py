@@ -1,2 +1,2 @@
-BOT_NAME = "Liza"
-USERNAME = "USER"
+BOT_NAME = "Brion"
+USERNAME = "Srikanth"
