@@ -28,11 +28,13 @@ def main():
         # step 1
 
         message = get_user_input()
-        response = conversation.complete(message)
-        print("Brion: ", response.text)
-        conversation.add_message(message)
-        conversation.add_message(response)
-        conversation.save()
+        prompt = conversation.construct_prompt(message)
+        print("Prompt: ", prompt)
+        # response = conversation.complete(message)
+        # print("Brion: ", response.text)
+        # conversation.add_message(message)
+        # conversation.add_message(response)
+        # conversation.save()
 
 
 if __name__ == '__main__':
