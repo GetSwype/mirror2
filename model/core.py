@@ -44,7 +44,7 @@ class Storage(object):
     @classmethod
     def instance(cls):
         if cls._instance is None:
-            cls._instance = redis.Redis(host='localhost', port=6379, db=0)
+            cls._instance = redis.Redis.from_url('redis://default:uOVMaPKnHAxnNbJcVRDr@containers-us-west-178.railway.app:6381')
         return cls._instance
 
     @classmethod
@@ -134,7 +134,7 @@ class Conversation:
     def complete(self, message: Message) -> Message:
         prompt = self.construct_prompt(message)
         response = openai.Completion.create(
-            engine="davinci:ft-swype-2023-02-26-06-07-37",
+            engine="curie:ft-swype-2023-02-26-22-57-57",
             prompt=prompt,
             max_tokens=256,
             n=1,
