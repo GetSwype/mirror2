@@ -136,7 +136,7 @@ class Conversation:
             prompt=prompt,
             max_tokens=256,
             n=1,
-            stop=None,
+            stop="<END>",
             temperature=0.5)
 
         assert response is not None, "OpenAI call failed"
