@@ -1,0 +1,3 @@
+Begin chatting with the user!
+Question: {input}
+{agent_scratchpad}

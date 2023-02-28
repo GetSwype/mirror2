@@ -1,11 +1,12 @@
-from model.core import Message, Conversation
+from model.conversator import Conversation, Message, Conversator
 import os
 import openai
 from constants import USERNAME
 import logging
 import sys
 
-logging.basicConfig(stream=sys.stdout, level=logging.CRITICAL)
+
+
 # logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 
@@ -15,7 +16,12 @@ def get_user_input() -> Message:
 
 
 def main():
-    conversation = Conversation("de4548e0-d9b6-46aa-be83-f22747d47393")
+    conversation = Conversation("21f48dbz-e784-4a4a-a9ef-deb213937187", bot_name="Briony")
+    cnv = Conversator(conversation)
+    print(conversation.context_window)
+    print(conversation.idx)
+    # logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    # logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
     while True:
 
         # Step 1: Get the current context window, ie last 10 messages between the user and the AI.
@@ -28,15 +34,13 @@ def main():
         # step 1
 
         message = get_user_input()
-        response = conversation.complete(message)
-        print("...................................")
-        print(response.text)
-        print("...................................")
-        conversation.add_message(message)
-        conversation.add_message(response)
-        conversation.save()
+        response = cnv.conversate(message)
+        print("=====================================")
+        print(f'{conversation.bot_name}: {response}')
+        print("=====================================")
+        
 
 
 if __name__ == '__main__':
-    openai.api_key = os.getenv('OPENAI_API_KEY')
+    openai.api_key = "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"
     main()
