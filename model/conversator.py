@@ -32,9 +32,10 @@ class Conversator:
             input_variables=["input", "agent_scratchpad", "chat_history"]
         )
         print(prompt.template)
-        llm_chain = LLMChain(llm=CustomLLM(n=10), prompt=prompt)
+        # llm_chain = LLMChain(llm=CustomLLM(n=10), prompt=prompt)
+        llm_chain_ = LLMChain(llm=OpenAI(model_name="text-davinci-003", temperature=0.2), prompt=prompt)
         tool_names = [tool.name for tool in tools]
-        agent = ConversationalAgent(llm_chain=llm_chain, allowed_tools=tool_names)
+        agent = ConversationalAgent(llm_chain=llm_chain_, allowed_tools=tool_names)
         self.agent_executor = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True)
 
     def conversate(self, message: Message, custom_response: Message=None, save=True) -> str:
